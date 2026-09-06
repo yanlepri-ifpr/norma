@@ -4,6 +4,7 @@ import {
   ArrowRight,
   CheckCircle,
   Circle,
+  FileDown,
   FileText,
   HelpCircle,
   Lock,
@@ -11,6 +12,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -20,7 +22,9 @@ import {
   PHASES,
   TASKS,
   TASK_REPLIES,
+  TASK_TEMPLATES,
   type Phase,
+  type Task,
 } from "@/lib/checklist-data";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +81,28 @@ export function Checklist({
     const file = e.target.files?.[0];
     if (file && targetId !== null) onAttach(targetId, file.name);
     e.target.value = "";
+  };
+
+  const downloadTemplate = (task: Task) => {
+    const fileName = TASK_TEMPLATES[task.id] ?? `modelo-etapa-${task.id}.docx`;
+    const content = [
+      "MODELO DE DOCUMENTO (PROTÓTIPO)",
+      "",
+      `Etapa ${task.id} — ${task.title}`,
+      "",
+      "Este é um modelo fictício gerado para demonstração do protótipo.",
+      "Substitua este conteúdo pelo documento oficial correspondente à etapa.",
+    ].join("\n");
+    const blob = new Blob([content], {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Download do modelo iniciado", { description: fileName });
   };
 
   return (
@@ -199,8 +225,7 @@ export function Checklist({
                         done_ && "line-through decoration-emerald-700/50",
                       )}
                     >
-                      <span className="text-muted-foreground">{task.id}.</span>{" "}
-                      {task.title}
+                      <span className="text-muted-foreground">{task.id}.</span> {task.title}
                     </p>
                     {attachments[task.id] && (
                       <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
@@ -228,8 +253,7 @@ export function Checklist({
                         }
                         className="h-7 gap-1 px-2 text-xs text-primary hover:bg-primary/10"
                       >
-                        <HelpCircle aria-hidden="true" className="size-3.5" />
-                        O que preencho aqui?
+                        <HelpCircle aria-hidden="true" className="size-3.5" />O que preencho aqui?
                       </Button>
                     </div>
 
@@ -257,32 +281,46 @@ export function Checklist({
                     )}
                   </div>
 
-                  {attachments[task.id] ? (
+                  <div className="flex shrink-0 items-center gap-2">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => onRemoveAttachment(task.id)}
-                      aria-label={`Remover arquivo da tarefa ${task.id}`}
-                      className="shrink-0 text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                      onClick={() => downloadTemplate(task)}
+                      aria-label={`Baixar modelo da tarefa ${task.id}`}
+                      className="shrink-0 text-muted-foreground hover:text-foreground"
                     >
-                      <Trash2 aria-hidden="true" className="size-4" />
-                      <span className="sr-only sm:not-sr-only">Remover</span>
+                      <FileDown aria-hidden="true" className="size-4" />
+                      <span className="sr-only sm:not-sr-only">Modelo</span>
                     </Button>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={!unlocked}
-                      onClick={() => pickFile(task.id)}
-                      aria-label={`Anexar arquivo à tarefa ${task.id}`}
-                      className="shrink-0"
-                    >
-                      <Paperclip aria-hidden="true" className="size-4" />
-                      <span className="sr-only sm:not-sr-only">Anexar</span>
-                    </Button>
-                  )}
+
+                    {attachments[task.id] ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onRemoveAttachment(task.id)}
+                        aria-label={`Remover arquivo da tarefa ${task.id}`}
+                        className="shrink-0 text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                      >
+                        <Trash2 aria-hidden="true" className="size-4" />
+                        <span className="sr-only sm:not-sr-only">Remover</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={!unlocked}
+                        onClick={() => pickFile(task.id)}
+                        aria-label={`Anexar arquivo à tarefa ${task.id}`}
+                        className="shrink-0"
+                      >
+                        <Paperclip aria-hidden="true" className="size-4" />
+                        <span className="sr-only sm:not-sr-only">Anexar</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </li>
             );

@@ -38,6 +38,29 @@ export const TASKS: Task[] = [
 
 export const FINAL_TASK_ID = 16;
 
+/**
+ * Modelo (.docx) fictício de cada etapa, apenas para demonstração do protótipo.
+ * O download gera um arquivo de conteúdo simulado com esse nome.
+ */
+export const TASK_TEMPLATES: Record<number, string> = {
+  1: "modelo-origem-processo.docx",
+  2: "modelo-cadastro-intencoes.docx",
+  3: "modelo-analise-central-compras.docx",
+  4: "modelo-verificacao-catmat.docx",
+  5: "modelo-formalizacao-demanda-dfd.docx",
+  6: "modelo-matriz-gerenciamento-riscos.docx",
+  7: "modelo-estudo-tecnico-preliminar-etp.docx",
+  8: "modelo-termo-referencia-tr.docx",
+  9: "modelo-portaria-fiscais.docx",
+  10: "modelo-mapa-comparativo-precos.docx",
+  11: "modelo-pesquisa-mercado.docx",
+  12: "modelo-anexo-orcamentos.docx",
+  13: "modelo-reserva-dotacao-orcamentaria.docx",
+  14: "modelo-minuta-edital.docx",
+  15: "modelo-protocolo-departamento-juridico.docx",
+  16: "modelo-parecer-juridico.docx",
+};
+
 export const DEFAULT_REPLY =
   "Boa pergunta! Para esta etapa, informe o objeto da contratação, fundamentos legais e anexe o documento correspondente no campo indicado. Posso detalhar um passo específico quando quiser.";
 

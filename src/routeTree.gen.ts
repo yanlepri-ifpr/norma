@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalistaRouteImport } from './routes/analista'
+import { Route as AnalistaIndexRouteImport } from './routes/analista/index'
+import { Route as AnalistaArquivosRouteImport } from './routes/analista/arquivos'
+import { Route as AnalistaChecklistRouteImport } from './routes/analista/checklist'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalistaRoute = AnalistaRouteImport.update({
+  id: '/analista',
+  path: '/analista',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalistaIndexRoute = AnalistaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AnalistaRoute,
+} as any)
+const AnalistaArquivosRoute = AnalistaArquivosRouteImport.update({
+  id: '/arquivos',
+  path: '/arquivos',
+  getParentRoute: () => AnalistaRoute,
+} as any)
+const AnalistaChecklistRoute = AnalistaChecklistRouteImport.update({
+  id: '/checklist',
+  path: '/checklist',
+  getParentRoute: () => AnalistaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analista': typeof AnalistaRouteWithChildren
+  '/analista/arquivos': typeof AnalistaArquivosRoute
+  '/analista/checklist': typeof AnalistaChecklistRoute
+  '/analista/': typeof AnalistaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analista/arquivos': typeof AnalistaArquivosRoute
+  '/analista/checklist': typeof AnalistaChecklistRoute
+  '/analista': typeof AnalistaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analista': typeof AnalistaRouteWithChildren
+  '/analista/arquivos': typeof AnalistaArquivosRoute
+  '/analista/checklist': typeof AnalistaChecklistRoute
+  '/analista/': typeof AnalistaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analista'
+    | '/analista/arquivos'
+    | '/analista/checklist'
+    | '/analista/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/analista/arquivos' | '/analista/checklist' | '/analista'
+  id:
+    | '__root__'
+    | '/'
+    | '/analista'
+    | '/analista/arquivos'
+    | '/analista/checklist'
+    | '/analista/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalistaRoute: typeof AnalistaRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analista': {
+      id: '/analista'
+      path: '/analista'
+      fullPath: '/analista'
+      preLoaderRoute: typeof AnalistaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analista/': {
+      id: '/analista/'
+      path: '/'
+      fullPath: '/analista/'
+      preLoaderRoute: typeof AnalistaIndexRouteImport
+      parentRoute: typeof AnalistaRoute
+    }
+    '/analista/arquivos': {
+      id: '/analista/arquivos'
+      path: '/arquivos'
+      fullPath: '/analista/arquivos'
+      preLoaderRoute: typeof AnalistaArquivosRouteImport
+      parentRoute: typeof AnalistaRoute
+    }
+    '/analista/checklist': {
+      id: '/analista/checklist'
+      path: '/checklist'
+      fullPath: '/analista/checklist'
+      preLoaderRoute: typeof AnalistaChecklistRouteImport
+      parentRoute: typeof AnalistaRoute
+    }
   }
 }
 
+interface AnalistaRouteChildren {
+  AnalistaArquivosRoute: typeof AnalistaArquivosRoute
+  AnalistaChecklistRoute: typeof AnalistaChecklistRoute
+  AnalistaIndexRoute: typeof AnalistaIndexRoute
+}
+
+const AnalistaRouteChildren: AnalistaRouteChildren = {
+  AnalistaArquivosRoute: AnalistaArquivosRoute,
+  AnalistaChecklistRoute: AnalistaChecklistRoute,
+  AnalistaIndexRoute: AnalistaIndexRoute,
+}
+
+const AnalistaRouteWithChildren = AnalistaRoute._addFileChildren(
+  AnalistaRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalistaRoute: AnalistaRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
