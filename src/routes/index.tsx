@@ -119,7 +119,7 @@ function Index() {
       <main className="min-w-0 flex-1">
         <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b bg-primary px-4 py-3 text-primary-foreground">
           <div className="min-w-0">
-            <p className="text-sm font-semibold">Compras Públicas</p>
+            <p className="text-sm font-semibold">Norma</p>
             <p className="text-xs text-primary-foreground/75">
               {completed.length} de {TASKS.length} tarefas concluídas
             </p>

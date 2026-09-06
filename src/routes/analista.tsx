@@ -35,7 +35,7 @@ function AnalistaLayout() {
                 <Scale aria-hidden="true" className="size-5" />
               </span>
               <div>
-                <p className="text-sm font-semibold leading-tight">Compras Públicas</p>
+                <p className="text-sm font-semibold leading-tight">Norma</p>
                 <p className="text-xs text-sidebar-foreground/70">Painel do Analista</p>
               </div>
             </div>
