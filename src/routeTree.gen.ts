@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalistaRouteImport } from './routes/analista'
+import { Route as FimRouteImport } from './routes/fim'
 import { Route as AnalistaIndexRouteImport } from './routes/analista/index'
 import { Route as AnalistaArquivosRouteImport } from './routes/analista/arquivos'
 import { Route as AnalistaChecklistRouteImport } from './routes/analista/checklist'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AnalistaRoute = AnalistaRouteImport.update({
   id: '/analista',
   path: '/analista',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FimRoute = FimRouteImport.update({
+  id: '/fim',
+  path: '/fim',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalistaIndexRoute = AnalistaIndexRouteImport.update({
@@ -44,12 +50,14 @@ const AnalistaChecklistRoute = AnalistaChecklistRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analista': typeof AnalistaRouteWithChildren
+  '/fim': typeof FimRoute
   '/analista/arquivos': typeof AnalistaArquivosRoute
   '/analista/checklist': typeof AnalistaChecklistRoute
   '/analista/': typeof AnalistaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/fim': typeof FimRoute
   '/analista/arquivos': typeof AnalistaArquivosRoute
   '/analista/checklist': typeof AnalistaChecklistRoute
   '/analista': typeof AnalistaIndexRoute
@@ -58,6 +66,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/analista': typeof AnalistaRouteWithChildren
+  '/fim': typeof FimRoute
   '/analista/arquivos': typeof AnalistaArquivosRoute
   '/analista/checklist': typeof AnalistaChecklistRoute
   '/analista/': typeof AnalistaIndexRoute
@@ -67,15 +76,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/analista'
+    | '/fim'
     | '/analista/arquivos'
     | '/analista/checklist'
     | '/analista/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analista/arquivos' | '/analista/checklist' | '/analista'
+  to: '/' | '/fim' | '/analista/arquivos' | '/analista/checklist' | '/analista'
   id:
     | '__root__'
     | '/'
     | '/analista'
+    | '/fim'
     | '/analista/arquivos'
     | '/analista/checklist'
     | '/analista/'
@@ -84,6 +95,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalistaRoute: typeof AnalistaRouteWithChildren
+  FimRoute: typeof FimRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -100,6 +112,13 @@ declare module '@tanstack/react-router' {
       path: '/analista'
       fullPath: '/analista'
       preLoaderRoute: typeof AnalistaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fim': {
+      id: '/fim'
+      path: '/fim'
+      fullPath: '/fim'
+      preLoaderRoute: typeof FimRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analista/': {
@@ -145,6 +164,7 @@ const AnalistaRouteWithChildren = AnalistaRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalistaRoute: AnalistaRouteWithChildren,
+  FimRoute: FimRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

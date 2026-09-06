@@ -64,9 +64,14 @@ export function Checklist({
   const isUnlocked = (id: number) => id === 1 || isDone(id - 1);
 
   const tasks = TASKS.filter((t) => t.phaseId === phase.id);
+  const finalTaskId =
+    TASKS.filter((t) => t.phaseId === PHASES[PHASES.length - 1]!.id).slice(-1)[0]?.id ??
+    FINAL_TASK_ID;
+  const isFinal = isDone(finalTaskId);
   const phaseDone = tasks.filter((t) => isDone(t.id)).length;
   const phasePct = Math.round((phaseDone / tasks.length) * 100);
   const phaseComplete = phaseDone === tasks.length;
+  const isLastPhase = phaseIndex === PHASES.length - 1;
   const isLast = phaseIndex === PHASES.length - 1;
 
   const fileRef = useRef<HTMLInputElement>(null);
@@ -81,6 +86,19 @@ export function Checklist({
     const file = e.target.files?.[0];
     if (file && targetId !== null) onAttach(targetId, file.name);
     e.target.value = "";
+  };
+
+  const handleApprove = () => {
+    const blob = new Blob([], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "processo de compra.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    onApprove();
   };
 
   const downloadTemplate = (task: Task) => {
@@ -122,7 +140,7 @@ export function Checklist({
               Check-list do Processo de Compras Públicas
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Acompanhe as 16 etapas obrigatórias até a validação jurídica do edital.
+              Acompanhe as {total} etapas obrigatórias para elaboração do edital.
             </p>
           </div>
           <p className="text-right">
@@ -142,19 +160,19 @@ export function Checklist({
       {finalStatus === "approved" && (
         <Alert className="border-emerald-600/40 bg-emerald-50 text-emerald-900">
           <CheckCircle aria-hidden="true" className="size-4 text-emerald-700" />
-          <AlertTitle>Edital aprovado pelo Jurídico</AlertTitle>
+          <AlertTitle>Processo concluído pelo Setor de Compras</AlertTitle>
           <AlertDescription className="text-emerald-800">
-            Processo concluído em 100%. O edital está liberado para publicação.
+            O edital está pronto.
           </AlertDescription>
         </Alert>
       )}
       {finalStatus === "returned" && (
         <Alert variant="destructive">
           <AlertCircle aria-hidden="true" className="size-4" />
-          <AlertTitle>Edital retornado para correção</AlertTitle>
+          <AlertTitle>Processo retornado para correção</AlertTitle>
           <AlertDescription>
-            A etapa 15 foi reaberta. Ajuste os apontamentos do Departamento Jurídico e reenvie o
-            processo.
+            A etapa {finalTaskId} foi reaberta. Ajuste os apontamentos do Setor de Compras e reenvie
+            o processo.
           </AlertDescription>
         </Alert>
       )}
@@ -183,7 +201,6 @@ export function Checklist({
           {tasks.map((task) => {
             const done_ = isDone(task.id);
             const unlocked = isUnlocked(task.id);
-            const isFinal = task.id === FINAL_TASK_ID;
             return (
               <li
                 key={task.id}
@@ -194,30 +211,6 @@ export function Checklist({
                 )}
               >
                 <div className="flex items-start gap-3">
-                  {isFinal ? (
-                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-primary text-[11px] font-bold text-primary">
-                      16
-                    </span>
-                  ) : (
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                        done_
-                          ? "border-emerald-600 bg-emerald-600 text-white"
-                          : "border-muted-foreground/40 bg-background",
-                      )}
-                    >
-                      {done_ ? (
-                        <CheckCircle aria-hidden="true" className="size-4" />
-                      ) : !unlocked ? (
-                        <Lock aria-hidden="true" className="size-3 text-muted-foreground" />
-                      ) : (
-                        <Circle aria-hidden="true" className="size-3 text-muted-foreground/60" />
-                      )}
-                    </span>
-                  )}
-
                   <div className="min-w-0 flex-1">
                     <p
                       className={cn(
@@ -256,29 +249,6 @@ export function Checklist({
                         <HelpCircle aria-hidden="true" className="size-3.5" />O que preencho aqui?
                       </Button>
                     </div>
-
-                    {isFinal && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <Button
-                          type="button"
-                          disabled={!unlocked || finalStatus === "approved"}
-                          onClick={onApprove}
-                          className="bg-emerald-600 text-white hover:bg-emerald-700"
-                        >
-                          <CheckCircle aria-hidden="true" className="size-4" />
-                          Aprovar Edital
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          disabled={!unlocked}
-                          onClick={onReturn}
-                        >
-                          <AlertCircle aria-hidden="true" className="size-4" />
-                          Retornar com Erro
-                        </Button>
-                      </div>
-                    )}
                   </div>
 
                   <div className="flex shrink-0 items-center gap-2">
@@ -327,6 +297,30 @@ export function Checklist({
           })}
         </ul>
       </section>
+
+      {(isLastPhase && isFinal) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4 shadow-sm">
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle aria-hidden="true" className="size-4 text-emerald-600" />
+            Edital pronto. Conclua o processo ou retorne com apontamentos.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              disabled={finalStatus === "approved"}
+              onClick={handleApprove}
+              className="bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              <CheckCircle aria-hidden="true" className="size-4" />
+              Gerar Processo
+            </Button>
+            <Button type="button" variant="destructive" onClick={onReturn} disabled={!isFinal}>
+              <AlertCircle aria-hidden="true" className="size-4" />
+              Retornar com Erro
+            </Button>
+          </div>
+        </div>
+      )}
 
       {!isLast && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4 shadow-sm">

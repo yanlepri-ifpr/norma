@@ -31,9 +31,9 @@ export const TASKS: Task[] = [
   { id: 11, phaseId: 3, title: "Construir Documento de Responsável de Pesquisa de Mercado" },
   { id: 12, phaseId: 3, title: "Fazer o Anexo de Orçamentos" },
   { id: 13, phaseId: 4, title: "Construir Nota de Reserva de Dotação Orçamentária" },
-  { id: 14, phaseId: 4, title: "Fazer Minuta do Edital" },
-  { id: 15, phaseId: 4, title: "Enviar ao Departamento Jurídico" },
-  { id: 16, phaseId: 4, title: "Validação do Jurídico (Aprovar ou Retornar)" },
+  // { id: 14, phaseId: 4, title: "Fazer Minuta do Edital" },
+  // { id: 15, phaseId: 4, title: "Enviar ao Departamento Jurídico" },
+  // { id: 16, phaseId: 4, title: "Validação do Jurídico (Aprovar ou Retornar)" },
 ];
 
 export const FINAL_TASK_ID = 16;

@@ -79,7 +79,7 @@ function Index() {
   const approve = () => {
     setCompleted((prev) => (prev.includes(FINAL_TASK_ID) ? prev : [...prev, FINAL_TASK_ID]));
     setFinalStatus("approved");
-    toast.success("Edital aprovado pelo Jurídico", {
+    toast.success("Edital aprovado gerado com sucesso", {
       description: "Processo concluído em 100%.",
     });
   };
@@ -88,7 +88,7 @@ function Index() {
     setCompleted((prev) => prev.filter((id) => id < 15));
     setFinalStatus("returned");
     toast.error("Edital retornado com apontamentos", {
-      description: "A etapa 15 foi reaberta para correção.",
+      description: "Última etapa reaberta.",
     });
   };
 
